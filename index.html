@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>KDZ WORLD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0f;color:#fff;font-family:'Segoe UI',sans-serif;overflow:hidden;height:100vh;width:100vw;touch-action:none;}
+.hidden{display:none!important;}
+#screen-login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0a0f,#0d1a2e,#0a0f0a);}
+.login-box{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:2.5rem 2rem;width:min(380px,90vw);}
+.g-logo{font-size:2.5rem;font-weight:900;letter-spacing:4px;text-align:center;margin-bottom:.2rem;}
+.g-logo span{color:#00e676;}
+.g-sub{text-align:center;color:#555;font-size:.75rem;letter-spacing:3px;margin-bottom:2rem;}
+.fg{margin-bottom:1rem;}
+.fg label{display:block;font-size:.75rem;color:#888;margin-bottom:.4rem;}
+.fg input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:.8rem 1rem;color:#fff;font-size:.95rem;outline:none;direction:rtl;transition:border-color .2s;}
+.fg input:focus{border-color:#00e676;}
+.fg input::placeholder{color:#444;}
+.lbtn{width:100%;background:#00e676;color:#0a0a0f;border:none;padding:.95rem;border-radius:8px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:.3rem;}
+.lerr{color:#ff5555;font-size:.75rem;text-align:center;margin-top:.7rem;min-height:1.1rem;}
+.lhint{color:#333;font-size:.7rem;text-align:center;margin-top:.8rem;}
+.lhint b{color:#00e676;}
+#screen-menu{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0a0f;}
+#menuBg{position:absolute;inset:0;}
+.muser{position:absolute;top:1.2rem;left:1.5rem;color:#444;font-size:.78rem;}
+.muser b{color:#00e676;}
+.mcontent{position:relative;z-index:2;text-align:center;}
+.mlogo{font-size:clamp(2.5rem,7vw,5rem);font-weight:900;letter-spacing:5px;text-shadow:0 0 40px rgba(0,230,118,0.4);}
+.mlogo span{color:#00e676;}
+.msub{color:#444;letter-spacing:4px;font-size:.8rem;margin-bottom:2.5rem;}
+.mbtn{display:block;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#fff;padding:.85rem 3rem;border-radius:4px;font-size:1rem;font-weight:700;cursor:pointer;margin:.4rem auto;min-width:220px;letter-spacing:2px;transition:all .2s;}
+.mbtn:hover,.mbtn.act{background:rgba(0,230,118,0.1);border-color:#00e676;color:#00e676;}
+#screen-options{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0a0a0f;}
+.obox{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:2rem;width:min(640px,92vw);max-height:88vh;overflow-y:auto;}
+.otitle{font-size:1.4rem;font-weight:900;color:#00e676;text-align:center;margin-bottom:1.5rem;letter-spacing:3px;}
+.otabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:1.5rem;}
+.otab{background:none;border:none;color:#555;padding:.7rem 1.2rem;cursor:pointer;font-size:.85rem;font-weight:700;border-bottom:2px solid transparent;transition:all .2s;}
+.otab.act{color:#00e676;border-bottom-color:#00e676;}
+.opanel{display:none;}
+.opanel.act{display:block;}
+.ctbl{width:100%;border-collapse:collapse;}
+.ctbl th{text-align:right;padding:.5rem .8rem;color:#555;font-size:.72rem;letter-spacing:2px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.ctbl td{padding:.6rem .8rem;font-size:.82rem;border-bottom:1px solid rgba(255,255,255,0.03);}
+.ctbl td:last-child{color:#00e676;}
+.kb{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:1px 8px;font-size:.72rem;margin:0 2px;}
+.bbtn{width:100%;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#888;padding:.7rem;border-radius:6px;cursor:pointer;margin-top:1.2rem;}
+#gameCanvas{display:block;position:fixed;inset:0;width:100vw;height:100vh;}
+#hud{position:fixed;top:0;left:0;right:0;padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;pointer-events:none;z-index:10;}
+.hspeed{background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:.4rem .9rem;text-align:center;}
+.snum{font-size:1.6rem;font-weight:900;color:#00e676;line-height:1;}
+.sunit{font-size:.6rem;color:#555;letter-spacing:2px;}
+.hmode{background:rgba(0,0,0,0.65);border:1px solid rgba(0,230,118,0.3);border-radius:8px;padding:.4rem .9rem;font-size:.72rem;color:#00e676;font-weight:700;letter-spacing:2px;}
+.hhint{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);border-radius:8px;padding:.4rem 1rem;font-size:.75rem;color:#888;text-align:center;pointer-events:none;z-index:10;white-space:nowrap;}
+#mctrl{position:fixed;inset:0;pointer-events:none;z-index:20;}
+.dpad{position:absolute;bottom:4.5rem;right:1.5rem;width:120px;height:120px;pointer-events:all;}
+.dp{position:absolute;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
+.dp.on{background:rgba(0,230,118,0.25);border-color:#00e676;}
+.dp-u{top:0;left:50%;transform:translateX(-50%);}
+.dp-d{bottom:0;left:50%;transform:translateX(-50%);}
+.dp-l{top:50%;left:0;transform:translateY(-50%);}
+.dp-r{top:50%;right:0;transform:translateY(-50%);}
+.abtn{position:absolute;bottom:4.5rem;left:1.5rem;pointer-events:all;}
+.ab{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:50%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;text-align:center;color:#fff;line-height:1.2;}
+.ab.on{background:rgba(0,230,118,0.25);border-color:#00e676;color:#00e676;}
+.pausebtn{position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:.35rem .7rem;font-size:.8rem;cursor:pointer;pointer-events:all;color:#aaa;}
+#screen-pause{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ptitle{font-size:2.5rem;font-weight:900;margin-bottom:2rem;letter-spacing:4px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="screen-login">
+  <div class="login-box">
+    <div class="g-logo">KDZ<span>.</span>WORLD</div>
+    <div class="g-sub">OPEN WORLD GAME</div>
+    <div class="fg"><label>اسم المستخدم</label><input id="uname" placeholder="أدخل اسمك..." autocomplete="off"/></div>
+    <div class="fg"><label>كلمة السر</label><input id="upass" type="password" placeholder="كلمة السر..."/></div>
+    <button class="lbtn" onclick="doLogin()">دخول ←</button>
+    <div class="lerr" id="lerr"></div>
+    <div class="lhint">تجربة: <b>kdz</b> / <b>1234</b></div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div id="screen-menu" class="hidden">
+  <canvas id="menuBg"></canvas>
+  <div class="muser">مرحباً، <b id="wname"></b></div>
+  <div class="mcontent">
+    <div class="mlogo">KDZ<span>.</span>WORLD</div>
+    <div class="msub">OPEN WORLD GAME</div>
+    <button class="mbtn act" onclick="startGame()">▶ ابدأ اللعبة</button>
+    <button class="mbtn" onclick="showOpts()">⚙ الخيارات</button>
+    <button class="mbtn" onclick="logout()">← خروج</button>
+  </div>
+</div>
+
+<!-- OPTIONS -->
+<div id="screen-options" class="hidden">
+  <div class="obox">
+    <div class="otitle">⚙ الخيارات</div>
+    <div class="otabs">
+      <button class="otab act" onclick="otab('pc')">💻 كيبورد</button>
+      <button class="otab" onclick="otab('mob')">📱 جوال</button>
+      <button class="otab" onclick="otab('gp')">🎮 كنترول</button>
+    </div>
+    <div class="opanel act" id="op-pc">
+      <table class="ctbl">
+        <tr><th>الحركة</th><th>الزر</th></tr>
+        <tr><td>للأمام</td><td><span class="kb">W</span> أو <span class="kb">↑</span></td></tr>
+        <tr><td>للخلف</td><td><span class="kb">S</span> أو <span class="kb">↓</span></td></tr>
+        <tr><td>يسار / يمين</td><td><span class="kb">A</span><span class="kb">D</span></td></tr>
+        <tr><td>ركوب / نزول السيارة</td><td><span class="kb">E</span></td></tr>
+        <tr><td>إيقاف مؤقت</td><td><span class="kb">ESC</span></td></tr>
+        <tr><td>تدوير الكاميرا</td><td>سحب الماوس يمين/يسار</td></tr>
+      </table>
+    </div>
+    <div class="opanel" id="op-mob">
+      <table class="ctbl">
+        <tr><th>الحركة</th><th>الكنترول</th></tr>
+        <tr><td>الحركة</td><td>D-Pad يمين الشاشة</td></tr>
+        <tr><td>ركوب / نزول</td><td>زر E يسار الشاشة</td></tr>
+        <tr><td>تدوير الكاميرا</td><td>اسحب بإصبعك على الشاشة</td></tr>
+        <tr><td>إيقاف مؤقت</td><td>زر ☰ أعلى اليمين</td></tr>
+      </table>
+    </div>
+    <div class="opanel" id="op-gp">
+      <table class="ctbl">
+        <tr><th>الحركة</th><th>الزر</th></tr>
+        <tr><td>تحريك الشخصية</td><td><span class="kb">Stick يسار</span></td></tr>
+        <tr><td>تدوير الكاميرا</td><td><span class="kb">Stick يمين</span></td></tr>
+        <tr><td>ركوب / نزول</td><td><span class="kb">X / A</span></td></tr>
+        <tr><td>إيقاف مؤقت</td><td><span class="kb">Start</span></td></tr>
+      </table>
+    </div>
+    <button class="bbtn" onclick="backMenu()">← رجوع</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<canvas id="gameCanvas" class="hidden"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="hmode" id="hmode">🚶 مشي</div>
+  <div class="hspeed"><div class="snum" id="snum">0</div><div class="sunit">KM/H</div></div>
+</div>
+<div class="hhint hidden" id="hhint">اضغط E للركوب في السيارة</div>
+
+<!-- MOBILE -->
+<div id="mctrl" class="hidden">
+  <button class="pausebtn" onclick="togglePause()">☰</button>
+  <div class="dpad">
+    <div class="dp dp-u" id="dp-up" ontouchstart="mk('up',1)" ontouchend="mk('up',0)">▲</div>
+    <div class="dp dp-d" id="dp-dn" ontouchstart="mk('dn',1)" ontouchend="mk('dn',0)">▼</div>
+    <div class="dp dp-l" id="dp-lt" ontouchstart="mk('lt',1)" ontouchend="mk('lt',0)">◄</div>
+    <div class="dp dp-r" id="dp-rt" ontouchstart="mk('rt',1)" ontouchend="mk('rt',0)">►</div>
+  </div>
+  <div class="abtn">
+    <div class="ab" id="ab-e" ontouchstart="mk('e',1);tryEnterCar()" ontouchend="mk('e',0)">E<br/>ركوب</div>
+  </div>
+</div>
+
+<!-- PAUSE -->
+<div id="screen-pause" class="hidden">
+  <div class="ptitle">⏸ PAUSE</div>
+  <button class="mbtn act" onclick="togglePause()" style="margin:.4rem auto;">▶ استمر</button>
+  <button class="mbtn" onclick="toMenu()" style="margin:.4rem auto;">🏠 القائمة</button>
+</div>
+
+<script>
+// ACCOUNTS
+const ACCOUNTS=[{u:'kdz',p:'1234'},{u:'admin',p:'admin'},{u:'player',p:'0000'}];
+let cuser='';
+const isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+const keys={},mks={};
+
+// LOGIN
+function doLogin(){
+  const u=document.getElementById('uname').value.trim();
+  const p=document.getElementById('upass').value.trim();
+  const e=document.getElementById('lerr');
+  if(!u||!p){e.textContent='أدخل بياناتك';return;}
+  const acc=ACCOUNTS.find(a=>a.u===u&&a.p===p);
+  if(acc){cuser=u;e.textContent='';document.getElementById('wname').textContent=u;show('screen-menu');startMenuBg();}
+  else{e.textContent='❌ بيانات غلط';document.getElementById('upass').value='';}
+}
+document.getElementById('upass').onkeydown=e=>{if(e.key==='Enter')doLogin();};
+document.getElementById('uname').onkeydown=e=>{if(e.key==='Enter')document.getElementById('upass').focus();};
+function logout(){cuser='';show('screen-login');stopMenuBg();}
+
+function show(id){
+  ['screen-login','screen-menu','screen-options'].forEach(s=>document.getElementById(s).classList.toggle('hidden',s!==id));
+}
+function showOpts(){show('screen-options');stopMenuBg();}
+function backMenu(){show('screen-menu');startMenuBg();}
+function otab(id){
+  document.querySelectorAll('.otab').forEach((t,i)=>t.classList.toggle('act',['pc','mob','gp'][i]===id));
+  document.querySelectorAll('.opanel').forEach(p=>p.classList.remove('act'));
+  document.getElementById('op-'+id).classList.add('act');
+}
+
+// MENU BG
+let mAnimId,mCtx,mAngle=0,mBuildings=[];
+function startMenuBg(){
+  const c=document.getElementById('menuBg');
+  c.width=window.innerWidth;c.height=window.innerHeight;
+  mCtx=c.getContext('2d');mBuildings=[];
+  for(let i=0;i<25;i++)mBuildings.push({x:Math.random()*c.width,h:60+Math.random()*180,w:30+Math.random()*55,col:`hsl(${200+Math.random()*60},25%,${10+Math.random()*12}%)`});
+  mLoop();
+}
+function mLoop(){
+  mAnimId=requestAnimationFrame(mLoop);
+  const c=document.getElementById('menuBg'),W=c.width,H=c.height;
+  mCtx.fillStyle='#0a0a0f';mCtx.fillRect(0,0,W,H);
+  mAngle+=0.002;
+  // Stars
+  for(let i=0;i<100;i++){
+    const x=(Math.sin(i*137.5+mAngle)*0.5+0.5)*W,y=(Math.cos(i*97.3)*0.5+0.5)*H*0.65;
+    const a=0.2+0.8*Math.abs(Math.sin(i+mAngle*3));
+    mCtx.fillStyle=`rgba(255,255,255,${a})`;
+    mCtx.beginPath();mCtx.arc(x,y,0.8,0,Math.PI*2);mCtx.fill();
+  }
+  const gy=H*0.7;
+  mCtx.fillStyle='#0f0f18';mCtx.fillRect(0,gy,W,H-gy);
+  mCtx.fillStyle='#1a1a28';mCtx.fillRect(0,gy+15,W,35);
+  mCtx.setLineDash([15,12]);mCtx.strokeStyle='rgba(255,255,0,0.3)';mCtx.lineWidth=2;
+  mCtx.beginPath();mCtx.moveTo(0,gy+32);mCtx.lineTo(W,gy+32);mCtx.stroke();
+  mCtx.setLineDash([]);
+  mBuildings.forEach(b=>{
+    mCtx.fillStyle=b.col;mCtx.fillRect(b.x,gy-b.h,b.w,b.h);
+    mCtx.fillStyle='rgba(255,255,120,0.35)';
+    for(let wy=gy-b.h+8;wy<gy-4;wy+=14)
+      for(let wx=b.x+4;wx<b.x+b.w-6;wx+=10)
+        if(Math.sin(wx*wy+mAngle*2)>0.2)mCtx.fillRect(wx,wy,6,9);
+    b.x=(b.x-0.5+W)%W;
+  });
+  const gr=mCtx.createRadialGradient(W/2,gy,0,W/2,gy,W*0.45);
+  gr.addColorStop(0,'rgba(0,230,118,0.07)');gr.addColorStop(1,'transparent');
+  mCtx.fillStyle=gr;mCtx.fillRect(0,0,W,H);
+}
+function stopMenuBg(){cancelAnimationFrame(mAnimId);}
+
+// GAME
+let gc,gctx,gameRunning=false,paused=false;
+let camX=0,camY=0,camAngle=0;
+let mouseDown=false,lastMX=0,tcX=0,tcY=0;
+const player={x:0,y:0,angle:0,inCar:false};
+const car={x:80,y:80,angle:0,speed:0};
+
+// World
+const roads=[
+  {x:-500,y:-15,w:1000,h:30},
+  {x:-15,y:-500,w:30,h:1000},
+  {x:-500,y:105,w:1000,h:30},
+  {x:-500,y:-135,w:1000,h:30},
+  {x:165,y:-500,w:30,h:1000},
+  {x:-195,y:-500,w:30,h:1000},
+];
+const buildings=[
+  {x:40,y:40,w:90,h:55,c:'#5a7a9a',s:'#3a5a7a',height:80},
+  {x:40,y:-110,w:75,h:55,c:'#7a5a4a',s:'#5a3a2a',height:60},
+  {x:-110,y:40,w:65,h:55,c:'#4a6a4a',s:'#2a4a2a',height:100},
+  {x:-110,y:-110,w:80,h:55,c:'#8a6a3a',s:'#6a4a1a',height:70},
+  {x:220,y:40,w:75,h:55,c:'#6a4a8a',s:'#4a2a6a',height:90},
+  {x:220,y:-110,w:65,h:55,c:'#3a6a5a',s:'#1a4a3a',height:65},
+  {x:-220,y:40,w:80,h:55,c:'#7a4a5a',s:'#5a2a3a',height:75},
+  {x:-220,y:-110,w:65,h:55,c:'#4a5a7a',s:'#2a3a5a',height:110},
+  {x:40,y:160,w:85,h:55,c:'#6a7a4a',s:'#4a5a2a',height:60},
+  {x:-110,y:160,w:75,h:55,c:'#8a5a5a',s:'#6a3a3a',height:85},
+  {x:220,y:160,w:65,h:55,c:'#5a8a6a',s:'#3a6a4a',height:70},
+  {x:-220,y:160,w:80,h:55,c:'#7a6a5a',s:'#5a4a3a',height:95},
+];
+const trees=[];
+for(let i=0;i<70;i++)trees.push({x:-450+Math.random()*900,y:-450+Math.random()*900,r:7+Math.random()*7});
+
+function startGame(){
+  show(null);stopMenuBg();
+  document.getElementById('gameCanvas').classList.remove('hidden');
+  document.getElementById('hud').classList.remove('hidden');
+  document.getElementById('hhint').classList.remove('hidden');
+  if(isMob)document.getElementById('mctrl').classList.remove('hidden');
+  gc=document.getElementById('gameCanvas');
+  gc.width=window.innerWidth;gc.height=window.innerHeight;
+  gctx=gc.getContext('2d');
+  player.x=5;player.y=5;player.angle=0;player.inCar=false;
+  car.x=80;car.y=80;car.angle=0;car.speed=0;
+  camX=5;camY=5;camAngle=0;
+  setupEvents();gameRunning=true;gameLoop();
+}
+
+function setupEvents(){
+  window.addEventListener('keydown',e=>{
+    keys[e.code]=true;
+    if(e.code==='KeyE')tryEnterCar();
+    if(e.code==='Escape')togglePause();
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+  },{passive:false});
+  window.addEventListener('keyup',e=>keys[e.code]=false);
+  gc.addEventListener('mousedown',e=>{mouseDown=true;lastMX=e.clientX;});
+  window.addEventListener('mouseup',()=>mouseDown=false);
+  window.addEventListener('mousemove',e=>{
+    if(!mouseDown)return;
+    camAngle-=(e.clientX-lastMX)*0.005;lastMX=e.clientX;
+  });
+  gc.addEventListener('touchstart',e=>{if(e.touches.length===1){tcX=e.touches[0].clientX;tcY=e.touches[0].clientY;}},{passive:true});
+  gc.addEventListener('touchmove',e=>{
+    if(e.touches.length===1){camAngle-=(e.touches[0].clientX-tcX)*0.006;tcX=e.touches[0].clientX;tcY=e.touches[0].clientY;}
+  },{passive:true});
+}
+
+function mk(k,v){
+  mks[k]=v;
+  const ids={up:'dp-up',dn:'dp-dn',lt:'dp-lt',rt:'dp-rt',e:'ab-e'};
+  document.getElementById(ids[k])?.classList.toggle('on',!!v);
+}
+
+function tryEnterCar(){
+  if(!player.inCar){
+    if(Math.hypot(player.x-car.x,player.y-car.y)<45){
+      player.inCar=true;
+      document.getElementById('hmode').textContent='🚗 قيادة';
+      document.getElementById('hhint').textContent='اضغط E للنزول من السيارة';
+    } else {
+      document.getElementById('hhint').textContent='اقترب من السيارة أولاً!';
+      setTimeout(()=>{if(document.getElementById('hhint'))document.getElementById('hhint').textContent='اضغط E للركوب في السيارة';},2000);
+    }
+  } else {
+    player.inCar=false;player.x=car.x+40;player.y=car.y;
+    document.getElementById('hmode').textContent='🚶 مشي';
+    document.getElementById('hhint').textContent='اضغط E للركوب في السيارة';
+  }
+}
+
+function togglePause(){
+  if(!gameRunning)return;
+  paused=!paused;
+  document.getElementById('screen-pause').classList.toggle('hidden',!paused);
+  if(!paused)gameLoop();
+}
+
+function toMenu(){
+  gameRunning=false;paused=false;
+  ['screen-pause','gameCanvas','hud','mctrl'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.classList.add('hidden');}
+  });
+  document.getElementById('hhint').classList.add('hidden');
+  show('screen-menu');startMenuBg();
+}
+
+function hitsBld(x,y,r){
+  for(const b of buildings){
+    const bx=b.x+b.w/2,by=b.y+b.h/2;
+    if(Math.abs(x-bx)<b.w/2+r&&Math.abs(y-by)<b.h/2+r)return true;
+  }
+  return false;
+}
+
+let lastT=0;
+function gameLoop(ts=0){
+  if(!gameRunning||paused)return;
+  requestAnimationFrame(gameLoop);
+  const dt=Math.min((ts-lastT)/1000,0.05);lastT=ts;
+  update(dt);draw();
+}
+
+function update(dt){
+  const pad=getGP();
+  let fwd=0,turn=0;
+  if(keys['KeyW']||keys['ArrowUp']||mks['up'])fwd=1;
+  if(keys['KeyS']||keys['ArrowDown']||mks['dn'])fwd=-1;
+  if(keys['KeyA']||keys['ArrowLeft']||mks['lt'])turn=-1;
+  if(keys['KeyD']||keys['ArrowRight']||mks['rt'])turn=1;
+  if(pad){
+    const ax=pad.axes[0],ay=pad.axes[1];
+    if(Math.abs(ax)>0.15)turn=ax;if(Math.abs(ay)>0.15)fwd=-ay;
+    if(pad.buttons[0]?.pressed)tryEnterCar();
+    if(pad.buttons[9]?.pressed)togglePause();
+    if(Math.abs(pad.axes[2])>0.15)camAngle+=pad.axes[2]*0.04;
+  }
+
+  if(player.inCar){
+    car.speed+=fwd*120*dt;car.speed*=0.93;car.speed=Math.max(-100,Math.min(220,car.speed));
+    if(Math.abs(car.speed)>1)car.angle+=turn*2.0*dt*Math.sign(car.speed);
+    const nx=car.x+Math.sin(car.angle)*car.speed*dt;
+    const ny=car.y-Math.cos(car.angle)*car.speed*dt;
+    if(!hitsBld(nx,car.y,14))car.x=nx;else car.speed*=-0.3;
+    if(!hitsBld(car.x,ny,14))car.y=ny;else car.speed*=-0.3;
+    car.x=Math.max(-480,Math.min(480,car.x));car.y=Math.max(-480,Math.min(480,car.y));
+    camX+=(car.x-camX)*0.1;camY+=(car.y-camY)*0.1;
+    document.getElementById('snum').textContent=Math.round(Math.abs(car.speed)*0.4);
+  } else {
+    const SPD=90;
+    const dx=Math.sin(camAngle)*fwd*SPD*dt+Math.cos(camAngle)*turn*SPD*dt;
+    const dy=-Math.cos(camAngle)*fwd*SPD*dt+Math.sin(camAngle)*turn*SPD*dt;
+    const nx=player.x+dx,ny=player.y+dy;
+    if(!hitsBld(nx,player.y,8))player.x=nx;
+    if(!hitsBld(player.x,ny,8))player.y=ny;
+    player.x=Math.max(-480,Math.min(480,player.x));player.y=Math.max(-480,Math.min(480,player.y));
+    if(dx||dy)player.angle=Math.atan2(dx,dy);
+    camX+=(player.x-camX)*0.14;camY+=(player.y-camY)*0.14;
+    document.getElementById('snum').textContent=Math.round(Math.hypot(dx,dy)/dt*0.28);
+  }
+}
+
+function getGP(){const p=navigator.getGamepads?.[0];return p||null;}
+
+// DRAW
+const ISCALE=1.3;
+function w2s(wx,wy){
+  const W=gc.width,H=gc.height;
+  const rx=wx-camX,ry=wy-camY;
+  const rx2=rx*Math.cos(camAngle)-ry*Math.sin(camAngle);
+  const ry2=rx*Math.sin(camAngle)+ry*Math.cos(camAngle);
+  return{sx:W/2+rx2*ISCALE,sy:H/2+ry2*ISCALE*0.52};
+}
+
+function draw(){
+  const W=gc.width,H=gc.height;
+  // Sky
+  const sky=gctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#5ba8d8');sky.addColorStop(0.6,'#a8d4f0');sky.addColorStop(1,'#d4eef9');
+  gctx.fillStyle=sky;gctx.fillRect(0,0,W,H);
+  // Ground
+  gctx.fillStyle='#5a9a45';gctx.fillRect(0,H*0.38,W,H);
+
+  const objs=[];
+  roads.forEach(r=>objs.push({t:'road',d:r,sy:r.y+r.h/2}));
+  trees.forEach(t=>objs.push({t:'tree',d:t,sy:t.y}));
+  buildings.forEach(b=>objs.push({t:'bld',d:b,sy:b.y+b.h}));
+  objs.push({t:'car',d:car,sy:car.y});
+  if(!player.inCar)objs.push({t:'player',d:player,sy:player.y});
+  objs.sort((a,b)=>a.sy-b.sy);
+  objs.forEach(o=>{
+    if(o.t==='road')dRoad(o.d);
+    else if(o.t==='tree')dTree(o.d);
+    else if(o.t==='bld')dBld(o.d);
+    else if(o.t==='car')dCar(o.d);
+    else if(o.t==='player')dPlayer(o.d);
+  });
+  dMinimap();
+}
+
+function dRoad(r){
+  const cs=[{x:r.x,y:r.y},{x:r.x+r.w,y:r.y},{x:r.x+r.w,y:r.y+r.h},{x:r.x,y:r.y+r.h}].map(p=>w2s(p.x,p.y));
+  gctx.beginPath();gctx.moveTo(cs[0].sx,cs[0].sy);cs.forEach(c=>gctx.lineTo(c.sx,c.sy));
+  gctx.closePath();gctx.fillStyle='#3d3d50';gctx.fill();
+  const m1=w2s(r.x+r.w/2,r.y),m2=w2s(r.x+r.w/2,r.y+r.h);
+  gctx.setLineDash([10,8]);gctx.strokeStyle='rgba(255,255,80,0.5)';gctx.lineWidth=1.5;
+  gctx.beginPath();gctx.moveTo(m1.sx,m1.sy);gctx.lineTo(m2.sx,m2.sy);gctx.stroke();
+  gctx.setLineDash([]);
+}
+
+function dBld(b){
+  const H3=b.height;
+  const tl=w2s(b.x,b.y),tr=w2s(b.x+b.w,b.y),br=w2s(b.x+b.w,b.y+b.h),bl=w2s(b.x,b.y+b.h);
+  // Front
+  gctx.beginPath();gctx.moveTo(bl.sx,bl.sy);gctx.lineTo(br.sx,br.sy);
+  gctx.lineTo(br.sx,br.sy-H3);gctx.lineTo(bl.sx,bl.sy-H3);gctx.closePath();
+  gctx.fillStyle=b.c;gctx.fill();
+  gctx.strokeStyle='rgba(0,0,0,0.15)';gctx.lineWidth=0.8;gctx.stroke();
+  // Side
+  gctx.beginPath();gctx.moveTo(br.sx,br.sy);gctx.lineTo(tr.sx,tr.sy);
+  gctx.lineTo(tr.sx,tr.sy-H3);gctx.lineTo(br.sx,br.sy-H3);gctx.closePath();
+  gctx.fillStyle=b.s;gctx.fill();gctx.stroke();
+  // Roof
+  gctx.beginPath();gctx.moveTo(tl.sx,tl.sy-H3);gctx.lineTo(tr.sx,tr.sy-H3);
+  gctx.lineTo(br.sx,br.sy-H3);gctx.lineTo(bl.sx,bl.sy-H3);gctx.closePath();
+  gctx.fillStyle=shade(b.c,20);gctx.fill();gctx.stroke();
+  // Windows
+  const nwx=Math.max(1,Math.floor(b.w/22)),nwy=Math.max(1,Math.floor(H3/28));
+  for(let wy=0;wy<nwy;wy++){
+    for(let wx=0;wx<nwx;wx++){
+      const t=(wy+0.5)/nwy,s=(wx+0.5)/nwx;
+      const p1={sx:bl.sx+(br.sx-bl.sx)*s,sy:bl.sy+(br.sy-bl.sy)*s};
+      const on=Math.sin(wx*4.1+wy*2.7+b.x)>0.1;
+      gctx.fillStyle=on?'rgba(255,255,160,0.85)':'rgba(0,10,60,0.5)';
+      gctx.fillRect(p1.sx-4,p1.sy-H3*t-6,9,11);
+    }
+  }
+}
+
+function shade(hex,amt){
+  const n=parseInt(hex.slice(1),16);
+  const r=Math.max(0,Math.min(255,(n>>16)+amt));
+  const g=Math.max(0,Math.min(255,((n>>8)&0xff)+amt));
+  const bv=Math.max(0,Math.min(255,(n&0xff)+amt));
+  return '#'+[r,g,bv].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function dTree(t){
+  const p=w2s(t.x,t.y);const h=t.r*2.8;
+  gctx.fillStyle='rgba(0,0,0,0.15)';
+  gctx.beginPath();gctx.ellipse(p.sx,p.sy+2,t.r*0.9,t.r*0.3,0,0,Math.PI*2);gctx.fill();
+  gctx.fillStyle='#7a4a20';gctx.fillRect(p.sx-2.5,p.sy-h*0.35,5,h*0.4);
+  gctx.fillStyle='#2a7a2a';
+  gctx.beginPath();gctx.arc(p.sx,p.sy-h*0.5,t.r*1.15,0,Math.PI*2);gctx.fill();
+  gctx.fillStyle='#3aaa3a';
+  gctx.beginPath();gctx.arc(p.sx-t.r*0.45,p.sy-h*0.38,t.r*0.85,0,Math.PI*2);gctx.fill();
+  gctx.beginPath();gctx.arc(p.sx+t.r*0.45,p.sy-h*0.38,t.r*0.85,0,Math.PI*2);gctx.fill();
+}
+
+function dCar(c){
+  const p=w2s(c.x,c.y);
+  gctx.save();gctx.translate(p.sx,p.sy);
+  gctx.rotate(c.angle-camAngle);
+  gctx.fillStyle='rgba(0,0,0,0.2)';
+  gctx.beginPath();gctx.ellipse(0,5,22,7,0,0,Math.PI*2);gctx.fill();
+  gctx.fillStyle='#cc2222';gctx.fillRect(-18,-11,36,22);
+  gctx.fillStyle='#aa1111';gctx.fillRect(-13,-24,26,16);
+  gctx.fillStyle='rgba(140,210,255,0.75)';gctx.fillRect(-10,-22,20,12);
+  gctx.fillStyle='#111';
+  [[-15,-9],[15,-9],[-15,9],[15,9]].forEach(([wx,wy])=>{gctx.beginPath();gctx.ellipse(wx,wy,5,4,0,0,Math.PI*2);gctx.fill();});
+  gctx.fillStyle='#ffffe0';gctx.fillRect(-18,-8,5,6);gctx.fillRect(13,-8,5,6);
+  gctx.restore();
+}
+
+function dPlayer(pl){
+  const p=w2s(pl.x,pl.y);
+  gctx.save();gctx.translate(p.sx,p.sy);gctx.rotate(pl.angle-camAngle);
+  gctx.fillStyle='rgba(0,0,0,0.18)';
+  gctx.beginPath();gctx.ellipse(0,5,8,3,0,0,Math.PI*2);gctx.fill();
+  gctx.fillStyle='#334499';gctx.fillRect(-4,4,4,11);gctx.fillRect(0,4,4,11);
+  gctx.fillStyle='#2255cc';gctx.fillRect(-6,-9,12,15);
+  gctx.fillStyle='#f5c6a0';gctx.beginPath();gctx.arc(0,-15,7,0,Math.PI*2);gctx.fill();
+  gctx.fillStyle='#2a1a00';gctx.beginPath();gctx.arc(0,-18,5,Math.PI,2*Math.PI);gctx.fill();
+  gctx.restore();
+}
+
+function dMinimap(){
+  const MW=110,MH=110,MX=10,MY=gc.height-MH-10;
+  gctx.fillStyle='rgba(0,0,0,0.6)';
+  gctx.strokeStyle='rgba(0,230,118,0.3)';gctx.lineWidth=1;
+  gctx.beginPath();
+  if(gctx.roundRect)gctx.roundRect(MX,MY,MW,MH,6);
+  else gctx.rect(MX,MY,MW,MH);
+  gctx.fill();gctx.stroke();
+  const SC=MW/1000,cx=MX+MW/2,cy=MY+MH/2;
+  gctx.fillStyle='#555566';
+  roads.forEach(r=>{gctx.fillRect(cx+(r.x-camX)*SC,cy+(r.y-camY)*SC,r.w*SC,r.h*SC);});
+  gctx.fillStyle='#6a7a9a';
+  buildings.forEach(b=>{gctx.fillRect(cx+(b.x-camX)*SC,cy+(b.y-camY)*SC,b.w*SC,b.h*SC);});
+  gctx.fillStyle='#ff4444';
+  gctx.beginPath();gctx.arc(cx+(car.x-camX)*SC,cy+(car.y-camY)*SC,4,0,Math.PI*2);gctx.fill();
+  if(!player.inCar){gctx.fillStyle='#00e676';gctx.beginPath();gctx.arc(cx+(player.x-camX)*SC,cy+(player.y-camY)*SC,3,0,Math.PI*2);gctx.fill();}
+  // Center dot
+  gctx.fillStyle='rgba(255,255,255,0.4)';
+  gctx.beginPath();gctx.arc(cx,cy,2,0,Math.PI*2);gctx.fill();
+}
+
+window.addEventListener('resize',()=>{
+  if(gc){gc.width=window.innerWidth;gc.height=window.innerHeight;}
+  const mb=document.getElementById('menuBg');
+  if(mb&&!mb.classList.contains('hidden')){mb.width=window.innerWidth;mb.height=window.innerHeight;}
+});
+</script>
+</body>
+</html>
